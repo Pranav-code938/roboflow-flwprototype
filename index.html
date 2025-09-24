@@ -3,157 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cattle Assessment App - FLW</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <title>Livestock Assessment - FLW Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🐄 Cattle Assessment</h1>
-            <p>Field Level Worker Tool</p>
-        </div>
-
-        <div class="translate-container">
-            <div id="google_translate_element"></div>
-        </div>
-
-        <div class="main-content">
-            <!-- Home Screen -->
-            <div id="home" class="screen active">
-                <h2>Select Assessment Type</h2>
-                <button class="action-button" onclick="goToBreed()">
-                    🔍 Breed Recognition
-                </button>
-                <button class="action-button" onclick="goToHealth()">
-                    ❤️ Health Assessment
-                </button>
-                <button class="action-button" onclick="goToAge()">
-                    📅 Age Estimation
-                </button>
+    <!-- Language Selection Modal -->
+    <div id="languageModal" class="modal active">
+        <div class="modal-content">
+            <div class="language-header">
+                <i class="fas fa-globe"></i>
+                <h2>Choose Language / भाषा चुनें</h2>
             </div>
-
-            <!-- Breed Recognition Screen -->
-            <div id="breed" class="screen">
-                <button class="back-button" onclick="goHome()">← Back</button>
-                <h2>Breed Recognition</h2>
-                
-                <div class="instructions">
-                    <h3>Instructions:</h3>
-                    <ul>
-                        <li>Take a clear side profile photo of the cattle</li>
-                        <li>Ensure good lighting</li>
-                        <li>Keep the entire animal in frame</li>
-                        <li>Avoid shadows and obstructions</li>
-                    </ul>
-                </div>
-
-                <div class="upload-area" onclick="document.getElementById('breedFileInput').click()">
-                    <div>📷 Tap to Upload Photo</div>
-                    <p>or</p>
-                    <button class="camera-button" onclick="openCamera('breed')">Use Camera</button>
-                </div>
-                
-                <input type="file" id="breedFileInput" class="file-input" accept="image/*" onchange="analyzeBreed(this.files[0])">
-                
-                <div id="breedResult" style="display: none;">
-                    <div class="result-card">
-                        <h3>Breed Detected:</h3>
-                        <div id="breedName" style="font-size: 24px; font-weight: bold; color: #2E7D32;"></div>
-                        <div>Confidence:</div>
-                        <div class="confidence-bar">
-                            <div id="breedConfidence" class="confidence-fill"></div>
-                        </div>
-                        <div id="breedPercentage"></div>
-                    </div>
-                </div>
-                
-                <div id="breedLoading" class="loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Analyzing breed...</p>
-                </div>
-            </div>
-
-            <!-- Health Assessment Screen -->
-            <div id="health" class="screen">
-                <button class="back-button" onclick="goHome()">← Back</button>
-                <h2>Health Assessment</h2>
-                
-                <div class="instructions">
-                    <h3>Instructions:</h3>
-                    <ul>
-                        <li>Capture a clear full-body photo</li>
-                        <li>Include face and body structure</li>
-                        <li>Ensure animal is standing normally</li>
-                        <li>Good lighting is essential</li>
-                    </ul>
-                </div>
-
-                <div class="upload-area" onclick="document.getElementById('healthFileInput').click()">
-                    <div>📷 Tap to Upload Photo</div>
-                    <p>or</p>
-                    <button class="camera-button" onclick="openCamera('health')">Use Camera</button>
-                </div>
-                
-                <input type="file" id="healthFileInput" class="file-input" accept="image/*" onchange="analyzeHealth(this.files[0])">
-                
-                <div id="healthResult" style="display: none;">
-                    <div class="result-card">
-                        <h3>Health Assessment:</h3>
-                        <div class="health-score" id="healthScore"></div>
-                        <div id="healthDetails"></div>
-                        <div><strong>Body Condition Score:</strong> <span id="bodyCondition"></span></div>
-                        <div><strong>Overall Status:</strong> <span id="healthStatus"></span></div>
-                    </div>
-                </div>
-                
-                <div id="healthLoading" class="loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Analyzing health...</p>
-                </div>
-            </div>
-
-            <!-- Age Estimation Screen -->
-            <div id="age" class="screen">
-                <button class="back-button" onclick="goHome()">← Back</button>
-                <h2>Age Estimation</h2>
-                
-                <div class="instructions">
-                    <h3>Instructions:</h3>
-                    <ul>
-                        <li>Focus on the face and teeth (if visible)</li>
-                        <li>Include body structure and size</li>
-                        <li>Ensure clear image quality</li>
-                        <li>Natural standing position preferred</li>
-                    </ul>
-                </div>
-
-                <div class="upload-area" onclick="document.getElementById('ageFileInput').click()">
-                    <div>📷 Tap to Upload Photo</div>
-                    <p>or</p>
-                    <button class="camera-button" onclick="openCamera('age')">Use Camera</button>
-                </div>
-                
-                <input type="file" id="ageFileInput" class="file-input" accept="image/*" onchange="analyzeAge(this.files[0])">
-                
-                <div id="ageResult" style="display: none;">
-                    <div class="result-card">
-                        <h3>Age Estimation:</h3>
-                        <div class="age-display" id="estimatedAge"></div>
-                        <div><strong>Life Stage:</strong> <span id="lifeStage"></span></div>
-                        <div><strong>Estimated Range:</strong> <span id="ageRange"></span></div>
-                        <div><strong>Confidence:</strong> <span id="ageConfidence"></span></div>
-                    </div>
-                </div>
-                
-                <div id="ageLoading" class="loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Analyzing age...</p>
-                </div>
+            <div class="language-grid">
+                <button class="language-btn" data-lang="en">English</button>
+                <button class="language-btn" data-lang="hi">हिंदी</button>
+                <button class="language-btn" data-lang="bn">বাংলা</button>
+                <button class="language-btn" data-lang="te">తెలుగు</button>
+                <button class="language-btn" data-lang="ta">தமிழ்</button>
+                <button class="language-btn" data-lang="mr">मराठी</button>
+                <button class="language-btn" data-lang="gu">ગુજરાતી</button>
+                <button class="language-btn" data-lang="kn">ಕನ್ನಡ</button>
+                <button class="language-btn" data-lang="ml">മലയാളം</button>
+                <button class="language-btn" data-lang="pa">ਪੰਜਾਬੀ</button>
+                <button class="language-btn" data-lang="or">ଓଡ଼ିଆ</button>
+                <button class="language-btn" data-lang="as">অসমীয়া</button>
             </div>
         </div>
     </div>
 
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-cow"></i>
+                <h1 data-translate="app_title">Cattle Assessment</h1>
+            </div>
+            <button class="lang-toggle" onclick="openLanguageModal()">
+                <i class="fas fa-globe"></i>
+                <span id="currentLang">EN</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Screen -->
+    <main class="main-container" id="mainScreen">
+        <div class="welcome-section">
+            <h2 data-translate="welcome">Welcome to Cattle Assessment Tool</h2>
+            <p data-translate="subtitle">Choose an assessment type for your cattle</p>
+        </div>
+        
+        <div class="action-grid">
+            <div class="action-card" onclick="selectAction('breed')">
+                <div class="card-icon breed-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 data-translate="breed_recognition">Cattle Breed Recognition</h3>
+                <p data-translate="breed_desc">Identify cattle breed from photo</p>
+                <div class="card-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="action-card" onclick="selectAction('health')">
+                <div class="card-icon health-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h3 data-translate="health_assessment">Cattle Health Check</h3>
+                <p data-translate="health_desc">Evaluate cattle health condition</p>
+                <div class="card-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="action-card" onclick="selectAction('age')">
+                <div class="card-icon age-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3 data-translate="age_estimation">Cattle Age Estimation</h3>
+                <p data-translate="age_desc">Estimate cattle age from photo</p>
+                <div class="card-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Assessment Screen -->
+    <div class="assessment-screen" id="assessmentScreen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 id="assessmentTitle"></h2>
+        </div>
+
+        <div class="assessment-content">
+            <!-- Instructions -->
+            <div class="instructions-card">
+                <h3 data-translate="instructions">Instructions</h3>
+                <ul id="instructionsList">
+                </ul>
+            </div>
+
+            <!-- Camera Section -->
+            <div class="camera-section">
+                <div class="camera-container" id="cameraContainer">
+                    <div class="camera-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p data-translate="tap_to_capture">Tap to capture or upload photo</p>
+                    </div>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <img id="capturedImage" style="display: none;" alt="Captured image">
+                </div>
+                
+                <div class="camera-controls">
+                    <button class="camera-btn" id="cameraBtn" onclick="openCamera()">
+                        <i class="fas fa-camera"></i>
+                        <span data-translate="take_photo">Take Photo</span>
+                    </button>
+                    <button class="upload-btn" onclick="uploadPhoto()">
+                        <i class="fas fa-upload"></i>
+                        <span data-translate="upload_photo">Upload Photo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h3 data-translate="results">Results</h3>
+                <div class="result-card" id="resultCard">
+                </div>
+                <button class="new-assessment-btn" onclick="newAssessment()">
+                    <span data-translate="new_assessment">New Assessment</span>
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p data-translate="analyzing">Analyzing image...</p>
+            </div>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    </div>
+
     <script src="script.js"></script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
