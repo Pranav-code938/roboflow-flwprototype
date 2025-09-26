@@ -46,6 +46,21 @@
                 <button class="voice-toggle" id="voiceToggle" onclick="toggleVoiceInput()">
                     <i class="fas fa-microphone"></i>
                 </button>
+                <button class="help-btn" id="helpBtn">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </div>
+        <div id="voiceCommandsPopup" class="popup">
+            <div class="popup-content">
+                <h3 data-translate="voice_commands_title">Voice Commands</h3>
+                <ul id="voiceCommandsList">
+                    <li><span data-translate="voice_cmd_breed">"Breed" or "नस्ल" to start breed assessment.</span></li>
+                    <li><span data-translate="voice_cmd_health">"Health" or "स्वास्थ्य" to start health check.</span></li>
+                    <li><span data-translate="voice_cmd_age">"Age" or "आयु" to start age estimation.</span></li>
+                    <li><span data-translate="voice_cmd_analyze">"Analyze" or "विश्लेषण" to process the image.</span></li>
+                    <li><span data-translate="voice_cmd_back">"Back" or "वापस" to go back.</span></li>
+                </ul>
             </div>
         </div>
     </header>
