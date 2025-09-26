@@ -159,74 +159,91 @@ function closeLanguageModal() {
 
 // Speech Recognition Setup
 function initializeSpeechRecognition() {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = currentLanguage === 'en' ? 'en-US' : `${currentLanguage}-IN`;
         
+        recognition.onstart = function() {
+            isListening = true;
+            document.getElementById('voiceToggle').classList.add('listening');
+            console.log("Listening for commands...");
+        };
+
         recognition.onresult = function(event) {
             const command = event.results[0][0].transcript.toLowerCase();
             handleVoiceCommand(command);
         };
         
-        recognition.onerror = function() {
-            setListeningState(false);
+        recognition.onerror = function(event) {
+            isListening = false;
+            document.getElementById('voiceToggle').classList.remove('listening');
+            console.error('Speech Recognition Error:', event.error);
         };
         
         recognition.onend = function() {
-            setListeningState(false);
+            isListening = false;
+            document.getElementById('voiceToggle').classList.remove('listening');
+            console.log("Listening stopped.");
         };
+    } else {
+        console.warn('Web Speech API not supported on this device.');
+        document.getElementById('voiceToggle').style.display = 'none'; // Hide button if not supported
     }
 }
 
-function toggleVoiceInput() {
-    if (!recognition) {
-        alert('Voice recognition not supported on this device.');
-        return;
-    }
-
+function toggleListening() {
     if (isListening) {
-        recognition.stop();
-        setListeningState(false);
+        if (recognition) {
+            recognition.stop();
+        }
     } else {
-        recognition.start();
-        setListeningState(true);
-    }
-}
-
-function setListeningState(listening) {
-    isListening = listening;
-    const voiceToggle = document.getElementById('voiceToggle');
-    if (listening) {
-        voiceToggle.classList.add('listening');
-    } else {
-        voiceToggle.classList.remove('listening');
+        if (recognition) {
+            recognition.start();
+        }
     }
 }
 
 function handleVoiceCommand(command) {
-    if (command.includes('analyze') || command.includes('विश्लेषण') || command.includes('start')) {
-        if (document.getElementById('assessmentScreen').classList.contains('active')) {
-            // Try to analyze if we're on assessment screen
-            const fileInput = document.getElementById('fileInput');
-            const capturedImage = document.getElementById('capturedImage');
-            if (fileInput.files.length > 0 || capturedImage.style.display !== 'none') {
-                // There's an image to analyze
+    const commands = {
+        'en': {
+            'breed': 'breed', 'health': 'health', 'age': 'age',
+            'analyze': 'analyze', 'start': 'analyze', 'back': 'back'
+        },
+        'hi': {
+            'नस्ल': 'breed', 'स्वास्थ्य': 'health', 'आयु': 'age',
+            'विश्लेषण': 'analyze', 'शुरू': 'analyze', 'वापस': 'back'
+        }
+    };
+
+    let action = null;
+    const currentCommands = commands[currentLanguage] || commands['en'];
+    
+    for (const key in currentCommands) {
+        if (command.includes(key)) {
+            action = currentCommands[key];
+            break;
+        }
+    }
+
+    if (action) {
+        console.log(`Command recognized: ${action}`);
+        if (action === 'back') {
+            goBack();
+        } else if (action === 'analyze') {
+            if (document.getElementById('assessmentScreen').classList.contains('active')) {
                 processCurrentImage();
             } else {
-                speakText('Please take a photo or upload an image first');
+                speakText(currentLanguage === 'hi' ? 'कृपया पहले एक मूल्यांकन प्रकार चुनें' : 'Please select an assessment type first');
             }
+        } else {
+            selectAction(action);
         }
-    } else if (command.includes('breed') || command.includes('नस्ल')) {
-        selectAction('breed');
-    } else if (command.includes('health') || command.includes('स्वास्थ्य')) {
-        selectAction('health');
-    } else if (command.includes('age') || command.includes('आयु')) {
-        selectAction('age');
-    } else if (command.includes('back') || command.includes('वापस')) {
-        goBack();
+    } else {
+        console.log(`Command not recognized: ${command}`);
     }
 }
 
