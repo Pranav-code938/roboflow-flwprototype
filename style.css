@@ -70,6 +70,92 @@ body {
     transform: translateY(-1px);
 }
 
+.voice-toggle, .help-btn {
+    background: #28a745;
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+}
+
+.voice-toggle:hover, .help-btn:hover {
+    background: #218838;
+    transform: scale(1.05);
+}
+
+.voice-toggle.listening {
+    background: #dc3545;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Voice Commands Pop-down Window */
+.popup {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    display: none;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.popup.active {
+    display: block;
+    opacity: 1;
+    animation: popDown 0.3s forwards;
+}
+
+@keyframes popDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.popup-content h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+.popup-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.popup-content li {
+    background: #f8f9ff;
+    border-radius: 8px;
+    padding: 0.7rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
 /* Language Modal */
 .modal {
     position: fixed;
@@ -308,6 +394,26 @@ body {
     color: white;
     font-size: 1.4rem;
     font-weight: 600;
+}
+
+.speak-btn {
+    background: #28a745;
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.speak-btn:hover {
+    background: #218838;
+    transform: scale(1.05);
 }
 
 /* Instructions Card */
@@ -571,11 +677,6 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Google Translate Widget */
-#google_translate_element {
-    display: none;
-}
-
 /* Responsive Design */
 @media (max-width: 480px) {
     .main-container, .assessment-screen {
@@ -597,15 +698,6 @@ body {
     
     .language-grid {
         grid-template-columns: 1fr;
-    }
-}
-
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
     }
 }
 
