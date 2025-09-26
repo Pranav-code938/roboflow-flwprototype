@@ -1,7 +1,7 @@
 // API Configuration
-const BREED_API_URL = "https://serverless.roboflow.com";
-const BREED_API_KEY = "bxfNUAG0fFZGcEggBdve";
-const AGE_API_KEY = "uzkuNWY0Fg8F6oMZzaX9";
+const BREED_API_URL = "https://detect.roboflow.com/cattle-breed-recognition/2";
+const AGE_API_URL = "https://detect.roboflow.com/cattle-age-detection/1";
+const API_KEY = "uzkuNWY0Fg8F6oMZzaX9"; // Using a single API key for clarity, assuming both models use the same key for this purpose
 
 // Global Variables
 let currentAction = '';
@@ -35,11 +35,11 @@ const translations = {
         health_title: "Cattle Health Assessment",
         age_title: "Cattle Age Estimation",
         voice_commands_title: "Voice Commands",
-        voice_cmd_breed: "\"Breed\" or \"नस्ल\" to start breed assessment.",
-        voice_cmd_health: "\"Health\" or \"स्वास्थ्य\" to start health check.",
-        voice_cmd_age: "\"Age\" or \"आयु\" to start age estimation.",
-        voice_cmd_analyze: "\"Analyze\" or \"विश्लेषण\" to process the image.",
-        voice_cmd_back: "\"Back\" or \"वापस\" to go back."
+        voice_cmd_breed: `"Breed" or "नस्ल" to start breed assessment.`,
+        voice_cmd_health: `"Health" or "स्वास्थ्य" to start health check.`,
+        voice_cmd_age: `"Age" or "आयु" to start age estimation.`,
+        voice_cmd_analyze: `"Analyze" or "विश्लेषण" to process the image.`,
+        voice_cmd_back: `"Back" or "वापस" to go back.`
     },
     hi: {
         app_title: "पशु मूल्यांकन",
@@ -62,11 +62,11 @@ const translations = {
         health_title: "पशु स्वास्थ्य मूल्यांकन",
         age_title: "पशु आयु अनुमान",
         voice_commands_title: "वॉयस कमांड",
-        voice_cmd_breed: "\"नस्ल\" या \"Breed\" बोलकर नस्ल मूल्यांकन शुरू करें।",
-        voice_cmd_health: "\"स्वास्थ्य\" या \"Health\" बोलकर स्वास्थ्य जांच शुरू करें।",
-        voice_cmd_age: "\"आयु\" या \"Age\" बोलकर आयु अनुमान शुरू करें।",
-        voice_cmd_analyze: "\"विश्लेषण\" या \"Analyze\" बोलकर छवि को प्रोसेस करें।",
-        voice_cmd_back: "\"वापस\" या \"Back\" बोलकर वापस जाएं।"
+        voice_cmd_breed: `"नस्ल" या "Breed" बोलकर नस्ल मूल्यांकन शुरू करें।`,
+        voice_cmd_health: `"स्वास्थ्य" या "Health" बोलकर स्वास्थ्य जांच शुरू करें।`,
+        voice_cmd_age: `"आयु" या "Age" बोलकर आयु अनुमान शुरू करें।`,
+        voice_cmd_analyze: `"विश्लेषण" या "Analyze" बोलकर छवि को प्रोसेस करें।`,
+        voice_cmd_back: `"वापस" या "Back" बोलकर वापस जाएं।`
     }
 };
 
@@ -551,20 +551,18 @@ async function processBreedRecognition(imageFile) {
     formData.append('file', imageFile);
     
     try {
-        // Using your exact breed recognition API
-        const response = await fetch(`${BREED_API_URL}/cattle-breed-recognition/2?api_key=${BREED_API_KEY}`, {
+        const response = await fetch(`${BREED_API_URL}?api_key=${API_KEY}`, {
             method: 'POST',
             body: formData
         });
         
         if (!response.ok) {
-            throw new Error('API request failed');
+            throw new Error(`API request failed with status ${response.status}`);
         }
         
         const data = await response.json();
         console.log('Breed API response:', data);
         
-        // Process API response
         if (data.predictions && data.predictions.length > 0) {
             return {
                 type: 'breed',
@@ -584,7 +582,6 @@ async function processBreedRecognition(imageFile) {
         }
     } catch (error) {
         console.error('Breed recognition error:', error);
-        // Return realistic fallback data
         return {
             type: 'breed',
             predictions: [
@@ -597,31 +594,42 @@ async function processBreedRecognition(imageFile) {
 }
 
 async function processAgeEstimation(imageFile) {
-    const formData = new FormData();
-    formData.append('file', imageFile);
+    const reader = new FileReader();
+    const base64Image = await new Promise(resolve => {
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(imageFile);
+    });
+
+    const payload = {
+        api_key: API_KEY,
+        image: {
+            type: "base64",
+            value: base64Image
+        }
+    };
     
     try {
-        // Using your exact age estimation API
-        const response = await fetch(`${BREED_API_URL}/cattle-age-detection/1?api_key=${AGE_API_KEY}`, {
+        const response = await fetch(`${AGE_API_URL}`, {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
         });
         
         if (!response.ok) {
-            throw new Error('Age API request failed');
+            throw new Error(`Age API request failed with status ${response.status}`);
         }
         
         const data = await response.json();
         console.log('Age API response:', data);
         
-        // Process API response
         if (data.predictions && data.predictions.length > 0) {
             const topPrediction = data.predictions[0];
             const confidence = Math.round(topPrediction.confidence * 100);
             
-            // Parse age from class name (assuming format like "3-years" or similar)
             const ageStr = topPrediction.class;
-            let years = 3, months = 0; // Default values
+            let years = 3, months = 0;
             
             if (ageStr.includes('year') || ageStr.includes('yr')) {
                 const yearMatch = ageStr.match(/(\d+)/);
@@ -649,7 +657,6 @@ async function processAgeEstimation(imageFile) {
         console.error('Age estimation error:', error);
     }
     
-    // Fallback data
     const ages = [
         { years: 3, months: 2, category: 'Young Adult Cow' },
         { years: 4, months: 6, category: 'Prime Adult Cow' },
@@ -724,19 +731,16 @@ function displayResults(result) {
             <div class="confidence-bar">
                 <div class="confidence-fill" style="width: ${result.predictions[0].confidence}%"></div>
             </div>
-        `;
-        
-        if (result.predictions.length > 1) {
-            resultHTML += '<div style="margin-top: 1rem;"><strong>Other possibilities:</strong></div>';
-            result.predictions.slice(1, 3).forEach(pred => {
-                resultHTML += `
+            ${result.predictions.length > 1 ? `
+                <div style="margin-top: 1rem;"><strong>Other possibilities:</strong></div>
+                ${result.predictions.slice(1, 3).map(pred => `
                     <div class="result-item">
                         <span class="result-label">${pred.class}:</span>
                         <span class="result-value">${pred.confidence}%</span>
                     </div>
-                `;
-            });
-        }
+                `).join('')}
+            ` : ''}
+        `;
     } else if (result.type === 'health') {
         resultHTML = `
             <div class="result-item">
@@ -751,11 +755,10 @@ function displayResults(result) {
                 <div class="confidence-fill" style="width: ${result.score}%"></div>
             </div>
             <div style="margin-top: 1rem;"><strong>Observations:</strong></div>
+            ${result.symptoms.map(symptom => `
+                <div style="padding: 0.3rem 0; color: #555;">• ${symptom}</div>
+            `).join('')}
         `;
-        
-        result.symptoms.forEach(symptom => {
-            resultHTML += `<div style="padding: 0.3rem 0; color: #555;">• ${symptom}</div>`;
-        });
     } else if (result.type === 'age') {
         resultHTML = `
             <div class="result-item">
@@ -774,18 +777,16 @@ function displayResults(result) {
                 <div class="confidence-fill" style="width: ${result.confidence}%"></div>
             </div>
             <div style="margin-top: 1rem;"><strong>Age indicators:</strong></div>
+            ${result.indicators.map(indicator => `
+                <div style="padding: 0.3rem 0; color: #555;">• ${indicator}</div>
+            `).join('')}
         `;
-        
-        result.indicators.forEach(indicator => {
-            resultHTML += `<div style="padding: 0.3rem 0; color: #555;">• ${indicator}</div>`;
-        });
     }
     
     resultCard.innerHTML = resultHTML;
     resultsSection.style.display = 'block';
     speakBtn.style.display = 'block';
     
-    // Animate confidence bars
     setTimeout(() => {
         const fills = document.querySelectorAll('.confidence-fill');
         fills.forEach(fill => {
@@ -818,6 +819,5 @@ function resetAssessmentScreen() {
     hideLoading();
     lastResults = null;
     
-    // Clear file input
     document.getElementById('fileInput').value = '';
 }
