@@ -33,7 +33,13 @@ const translations = {
         analyzing: "Analyzing cattle image...",
         breed_title: "Cattle Breed Recognition",
         health_title: "Cattle Health Assessment",
-        age_title: "Cattle Age Estimation"
+        age_title: "Cattle Age Estimation",
+        voice_commands_title: "Voice Commands",
+        voice_cmd_breed: "\"Breed\" or \"नस्ल\" to start breed assessment.",
+        voice_cmd_health: "\"Health\" or \"स्वास्थ्य\" to start health check.",
+        voice_cmd_age: "\"Age\" or \"आयु\" to start age estimation.",
+        voice_cmd_analyze: "\"Analyze\" or \"विश्लेषण\" to process the image.",
+        voice_cmd_back: "\"Back\" or \"वापस\" to go back."
     },
     hi: {
         app_title: "पशु मूल्यांकन",
@@ -54,7 +60,13 @@ const translations = {
         analyzing: "पशु की तस्वीर का विश्लेषण कर रहे हैं...",
         breed_title: "पशु नस्ल की पहचान",
         health_title: "पशु स्वास्थ्य मूल्यांकन",
-        age_title: "पशु आयु अनुमान"
+        age_title: "पशु आयु अनुमान",
+        voice_commands_title: "वॉयस कमांड",
+        voice_cmd_breed: "\"नस्ल\" या \"Breed\" बोलकर नस्ल मूल्यांकन शुरू करें।",
+        voice_cmd_health: "\"स्वास्थ्य\" या \"Health\" बोलकर स्वास्थ्य जांच शुरू करें।",
+        voice_cmd_age: "\"आयु\" या \"Age\" बोलकर आयु अनुमान शुरू करें।",
+        voice_cmd_analyze: "\"विश्लेषण\" या \"Analyze\" बोलकर छवि को प्रोसेस करें।",
+        voice_cmd_back: "\"वापस\" या \"Back\" बोलकर वापस जाएं।"
     }
 };
 
@@ -271,14 +283,32 @@ function updateTexts() {
 function setupEventListeners() {
     const fileInput = document.getElementById('fileInput');
     fileInput.addEventListener('change', handleFileSelect);
-    
-    // Close modal when clicking outside
+
+    const helpBtn = document.getElementById('helpBtn');
+    helpBtn.addEventListener('click', toggleVoiceCommandsPopup);
+
+    // Close modal and pop-down window when clicking outside
     document.getElementById('languageModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeLanguageModal();
         }
     });
+
+    document.addEventListener('click', function(e) {
+        const popup = document.getElementById('voiceCommandsPopup');
+        if (popup.classList.contains('active') && !popup.contains(e.target) && e.target.id !== 'helpBtn' && !e.target.closest('.help-btn')) {
+            popup.classList.remove('active');
+        }
+    });
 }
+
+// New Pop-down Window Function
+function toggleVoiceCommandsPopup() {
+    const popup = document.getElementById('voiceCommandsPopup');
+    popup.classList.toggle('active');
+    updateTexts(); // Update texts to ensure they are in the correct language
+}
+
 
 // Main Navigation Functions
 function selectAction(action) {
