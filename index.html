@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Livestock Assessment - FLW Tool</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Language Selection Modal -->
     <div id="languageModal" class="modal active">
         <div class="modal-content">
             <div class="language-header">
@@ -33,21 +32,24 @@
         </div>
     </div>
 
-    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <div class="logo">
                 <i class="fas fa-cow"></i>
                 <h1 data-translate="app_title">Cattle Assessment</h1>
             </div>
-            <button class="lang-toggle" onclick="openLanguageModal()">
-                <i class="fas fa-globe"></i>
-                <span id="currentLang">EN</span>
-            </button>
+            <div style="display: flex; align-items: center;">
+                <button class="lang-toggle" onclick="openLanguageModal()">
+                    <i class="fas fa-globe"></i>
+                    <span id="currentLang">EN</span>
+                </button>
+                <button class="voice-toggle" id="voiceToggle" onclick="toggleVoiceInput()">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Screen -->
     <main class="main-container" id="mainScreen">
         <div class="welcome-section">
             <h2 data-translate="welcome">Welcome to Cattle Assessment Tool</h2>
@@ -90,24 +92,24 @@
         </div>
     </main>
 
-    <!-- Assessment Screen -->
     <div class="assessment-screen" id="assessmentScreen">
         <div class="screen-header">
             <button class="back-btn" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <h2 id="assessmentTitle"></h2>
+            <button class="speak-btn" id="speakBtn" onclick="speakResults()" style="display: none;">
+                <i class="fas fa-volume-up"></i>
+            </button>
         </div>
 
         <div class="assessment-content">
-            <!-- Instructions -->
             <div class="instructions-card">
                 <h3 data-translate="instructions">Instructions</h3>
                 <ul id="instructionsList">
                 </ul>
             </div>
 
-            <!-- Camera Section -->
             <div class="camera-section">
                 <div class="camera-container" id="cameraContainer">
                     <div class="camera-placeholder">
@@ -130,7 +132,6 @@
                 </div>
             </div>
 
-            <!-- Results Section -->
             <div class="results-section" id="resultsSection" style="display: none;">
                 <h3 data-translate="results">Results</h3>
                 <div class="result-card" id="resultCard">
@@ -140,7 +141,6 @@
                 </button>
             </div>
 
-            <!-- Loading -->
             <div class="loading" id="loading" style="display: none;">
                 <div class="loading-spinner"></div>
                 <p data-translate="analyzing">Analyzing image...</p>
@@ -151,6 +151,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
